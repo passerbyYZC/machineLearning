@@ -31,6 +31,13 @@ def classify0(inX, dataSet, labels, k):
     distances = sqDistances**0.5    
     sortedDistIndicies = distances.argsort()
 
-    # 计算最近临近类别频率
+    # 计算最近临近类别频率并选择最近的k个邻居
     classCount = {}
-    
+    for i in range(k):
+        voteIlabel = labels[sortedDistIndicies[i]]
+        classCount[voteIlabel] = classCount.get(voteIlabel, 0)+1
+        sortedClassCount = sorted(classCount.items(), key = operator.itemgetter(i), reverse=True)
+    return sortedClassCount[0][0]
+
+group, labels = createDataSet()
+print(classify0([1.0,1.1], group, labels, 2))
