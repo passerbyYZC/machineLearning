@@ -1,5 +1,6 @@
 # encoding:utf-8
 
+import os
 import numpy as np
 import operator
 
@@ -31,7 +32,7 @@ def classify0(inX, dataSet, labels, k):
     for i in range(k):
         voteIlabel = labels[sortedDistIndicies[i]]
         classCount[voteIlabel] = classCount.get(voteIlabel, 0)+1
-        sortedClassCount = sorted(classCount.items(), key = operator.itemgetter(i), reverse=True)
+    sortedClassCount = sorted(classCount.items(), key = operator.itemgetter(1), reverse=True)
     return sortedClassCount[0][0]
 
 def file2matrix(filename):
@@ -41,7 +42,7 @@ def file2matrix(filename):
         filename: 文本文件路径
     
     Return:
-        数据样本矩阵，样本标签向量
+        数据样本矩阵、样本标签向量
     """
     with open(filename, "r") as fr:
         arrayOlines = fr.readlines()
@@ -76,3 +77,57 @@ def autoNorm(dataSet):
     normDataSet = dataSet - np.tile(minVals, (m,1))
     normDataSet = normDataSet/np.tile(ranges, (m,1))
     return normDataSet, range, minVals
+
+def img2vector(filename):
+    """图像转换为向量
+    
+    Args:
+        filename: 文本文件路径
+    
+    Return:
+        图像向量
+    """
+    returnVect = np.zeros((1,1024))
+    with open(filename, "r") as fr:
+        for i in range(32):
+            lineStr = fr.readline()
+            for j in range(32):
+                returnVect[0, 32*i+j] = int(lineStr[j])
+    return returnVect
+
+def handwritingClassTest(trainingFilesDir, testFilsDir):
+    """手写数字识别系统测试函数
+    Args:
+        trainingFilesDir: 训练文件目录
+        testFilsDir: 测试文件目录
+    """
+    hwLabels = []
+    trainingFileList = os.listdir(trainingFilesDir)
+    m = len(trainingFileList)
+    trainingMat = np.zeros((m, 1024))
+    for i in  range(m):
+        # 获取训练图像标签
+        fileNameStr = trainingFileList[i]
+        fileStr = fileNameStr.split(".")[0]
+        classNumStr = int(fileStr.split("_")[0])
+        hwLabels.append(classNumStr)
+        # 获取训练图像数据
+        trainingMat[i,:] = img2vector(trainingFilesDir + '\\' + fileNameStr)
+
+    # 获取测试数据
+    testFileList = os.listdir(testFilsDir)
+    errorCount = 0
+    mTest = len(testFileList)
+    for i in range(mTest):
+        # 获取测试图像标签
+        fileNameStr = testFileList[i]
+        fileStr = fileNameStr.split(".")[0]
+        classNumStr = int(fileStr.split("_")[0])
+        # 获取测试图像数据
+        vectorUnderTest = img2vector(testFilsDir + '\\' + fileNameStr)
+        classifierResult = classify0(vectorUnderTest, trainingMat, hwLabels, 3)
+        print("the classifier came back with: %d, the real answer is: %d" % (classifierResult, classNumStr))
+        if(classifierResult != classNumStr): 
+            errorCount += 1
+    print("\nthe total number of errors is: %d" % errorCount)
+    print("\nthe total error rate is: %f" % (errorCount/float(mTest)))
