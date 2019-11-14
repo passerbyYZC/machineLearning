@@ -21,7 +21,7 @@ def classify0(inX, dataSet, labels, k):
     dataSetSize = dataSet.shape[0]
 
     # 距离计算并升序排序
-    diffMat = np.tile(inX, (dataSetSize,1)) - dataSetSize
+    diffMat = np.tile(inX, (dataSetSize,1)) - dataSet
     sqDiffMat = diffMat**2
     sqDistances = sqDiffMat.sum(axis=1)
     distances = sqDistances**0.5    
@@ -105,7 +105,7 @@ def handwritingClassTest(trainingFilesDir, testFilsDir):
     trainingFileList = os.listdir(trainingFilesDir)
     m = len(trainingFileList)
     trainingMat = np.zeros((m, 1024))
-    for i in  range(m):
+    for i in range(m):
         # 获取训练图像标签
         fileNameStr = trainingFileList[i]
         fileStr = fileNameStr.split(".")[0]
@@ -125,7 +125,7 @@ def handwritingClassTest(trainingFilesDir, testFilsDir):
         classNumStr = int(fileStr.split("_")[0])
         # 获取测试图像数据
         vectorUnderTest = img2vector(testFilsDir + '\\' + fileNameStr)
-        classifierResult = classify0(vectorUnderTest, trainingMat, hwLabels, 3)
+        classifierResult = classify0(vectorUnderTest, trainingMat, hwLabels, 10)
         print("the classifier came back with: %d, the real answer is: %d" % (classifierResult, classNumStr))
         if(classifierResult != classNumStr): 
             errorCount += 1
