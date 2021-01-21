@@ -21,4 +21,5 @@ from numpy import array
 trainingFilesDir = r"C:\Users\Yaozh\Documents\VSCode\github\machineLearning\machineLearning\kNN\digits\trainingDigits"
 testFilesDir = r"C:\Users\Yaozh\Documents\VSCode\github\machineLearning\machineLearning\kNN\digits\testDigits"
 
+
 KNN.handwritingClassTest(trainingFilesDir, testFilesDir)
